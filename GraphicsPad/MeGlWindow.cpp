@@ -42,12 +42,41 @@ void MeGlWindow::paintGL()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 
-	mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
-	mat4 projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(0.0f, 0.0f, -3.0f));
-	mat4 fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 54.0f, vec3(1.0f, 0.0f, 0.0f));
+	mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 5.0f);
+
+	//Cube 1
+	mat4 projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(3.0f, 1.5f, -5.0f));
+	mat4 fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 120.0f, vec3(0.0f, 1.0f, 0.0f));
 
 	GLint fullTransformMatrixUniformLocation =
 		glGetUniformLocation(programID, "fullTransformMatrix");
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1,
+		GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+
+	//Cube 2
+	projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(3.0f, -1.5f, -5.0f));
+	fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 120.0f, vec3(0.0f, 1.0f, 0.0f));
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1,
+		GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+
+	//Cube 3
+	projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(-3.0f, -1.5f, -5.0f));
+	fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 120.0f, vec3(0.0f, 1.0f, 0.0f));
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1,
+		GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+
+	//Cube 3
+	projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(-3.0f, 1.5f, -5.0f));
+	fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 120.0f, vec3(0.0f, 1.0f, 0.0f));
 
 	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1,
 		GL_FALSE, &fullTransformMatrix[0][0]);
