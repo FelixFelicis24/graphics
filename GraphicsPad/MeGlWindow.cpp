@@ -40,18 +40,45 @@ void MeGlWindow::paintGL()
 
 	GLint dominatingColorUniformLocation = 
 		glGetUniformLocation(programID, "dominatingColor");
+	GLint xFlipUniformLocation =
+		glGetUniformLocation(programID, "xFlip");
 	GLint yFlipUniformLocation =
 		glGetUniformLocation(programID, "yFlip");
-	vec3 dominatingColor(1.0f, 0.0f, 0.0f);
+	//GLint zFlipUniformLocation =
+	//	glGetUniformLocation(programID, "zFlip");
+	vec3 dominatingColor(0.9f, 0.6f, 0.2f);
 
 	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniformLocation, 1.0f);
+	glUniform1f(xFlipUniformLocation, 0.5f);
+	glUniform1f(yFlipUniformLocation, 0.5f);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 
 	dominatingColor.r = 0;
 	dominatingColor.b = 1;
 	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniformLocation, -1.0f);
+	glUniform1f(yFlipUniformLocation, -0.5f);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+	dominatingColor.r = 0.3;
+	dominatingColor.g = 0.8;
+	dominatingColor.b = 0.8;
+	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	glUniform1f(xFlipUniformLocation, 1.0f);
+	glUniform1f(yFlipUniformLocation, 0.25f);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+	dominatingColor.g = 1.0;
+	dominatingColor.b = 0.5;
+	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	glUniform1f(xFlipUniformLocation, 1.0f);
+	glUniform1f(yFlipUniformLocation, -0.25f);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+	dominatingColor.g = 0.2;
+	dominatingColor.b = 0.5;
+	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	glUniform1f(xFlipUniformLocation, 0.25f);
+	glUniform1f(yFlipUniformLocation, 1.0f);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
 }
 
