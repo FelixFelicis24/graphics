@@ -10,14 +10,14 @@ ShapeData ShapeGenerator::makeTriangle()
 
 	Vertex myTri[] =
 	{
-		glm::vec3(+0.0f, +1.0f, +0.0f),
-		glm::vec3(+1.0f, +0.0f, +0.0f),
+		glm::vec3(+0.0f, +0.5f, +0.0f),
+		glm::vec3(+0.8f, +0.5f, +0.0f),
 
-		glm::vec3(-1.0f, -1.0f, +0.0f),
-		glm::vec3(+0.0f, +1.0f, +0.0f),
+		glm::vec3(-0.5f, -0.5f, +0.0f),
+		glm::vec3(+0.0f, +0.2f, +0.4f),
 
-		glm::vec3(+1.0f, -1.0f, +0.0f),
-		glm::vec3(+0.0f, +0.0f, +1.0f),
+		glm::vec3(+0.5f, -0.5f, +0.0f),
+		glm::vec3(+0.0f, +0.2f, +1.0f),
 	};
 	ret.numVertices = NUM_ARRAY_ELEMENTS(myTri);
 	ret.vertices = new Vertex[ret.numVertices];
