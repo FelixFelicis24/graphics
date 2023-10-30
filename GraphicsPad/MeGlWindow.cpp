@@ -16,6 +16,24 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
 GLuint numIndices;
 
+void AppendTriangle(GLintptr vertexOffset, GLintptr indexOffset)
+{
+	Vertex triangle[] =
+	{
+		glm::vec3(-1.0f, +1.0f, -5.0f),
+		glm::vec3(+0.48, +0.44, +0.86),
+
+		glm::vec3(+1.0f, +0.0f, -5.0f),
+		glm::vec3(+0.57, +0.44, +0.86),
+
+		glm::vec3(+0.5f, + 1.0f, -5.0f),
+		glm::vec3(+0.3, +0.0, +0.5),
+	};
+
+	GLsizeiptr vertexSize = sizeof(triangle);
+	glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, vertexSize, triangle);
+}
+
 void sendDataToOpenGL()
 {
 	ShapeData shape = ShapeGenerator::makeCube();
@@ -24,6 +42,7 @@ void sendDataToOpenGL()
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, shape.vertexBufferSize(), shape.vertices, GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
 	glEnableVertexAttribArray(1);
@@ -34,7 +53,12 @@ void sendDataToOpenGL()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexArrayBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shape.indexBufferSize(), shape.indices, GL_STATIC_DRAW);
 	numIndices = shape.numIndices;
+
+	AppendTriangle(shape.vertexBufferSize(), shape.indexBufferSize());
+
 	shape.cleanup();
+
+	
 }
 
 void MeGlWindow::paintGL()
@@ -82,7 +106,19 @@ void MeGlWindow::paintGL()
 		GL_FALSE, &fullTransformMatrix[0][0]);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+
+	// 2d Triangle
+	projectionTranslationMatrix = glm::translate(projectionMatrix, vec3(0.0f, 0.0f, -5.0f));
+	fullTransformMatrix = glm::rotate(projectionTranslationMatrix, 54.0f, vec3(1.0f, 0.04f, 0.0f));
+
+	glUniformMatrix4fv(fullTransformMatrixUniformLocation, 1,
+		GL_FALSE, &fullTransformMatrix[0][0]);
+
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, (void*)72);
+
+	
 }
+
 
 bool checkStatus(
 	GLuint objectID,
@@ -166,4 +202,5 @@ void MeGlWindow::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 	sendDataToOpenGL();
 	installShaders();
+
 }
