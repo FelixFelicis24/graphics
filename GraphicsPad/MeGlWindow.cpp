@@ -107,10 +107,12 @@ void MeGlWindow::paintGL()
 
 	// Triangle
 	glBindVertexArray(triangleVertexArrayObjectID);
-	mat4 triangle2ModelToWorldMatrix = glm::translate(3.0f, -1.0f, -3.0f);
-	fullTransformMatrix = worldToProjectionMatrix * triangle2ModelToWorldMatrix;
+	//mat4 triangle2ModelToWorldMatrix = glm::translate(3.0f, -1.0f, -3.0f);
+	fullTransformMatrix = mat4();
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, triangleNumIndices, GL_UNSIGNED_SHORT, (void*)triangleIndexByteOffset);
+
+	
 }
 
 void MeGlWindow::mouseMoveEvent(QMouseEvent* e)
