@@ -33,7 +33,7 @@ GLuint triangleIndexByteOffset;
 void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData cube = ShapeGenerator::makeCube();
-	ShapeData triangle = ShapeGenerator::makeTriangle();
+	ShapeData triangle = ShapeGenerator::makePipe();
 
 	glGenBuffers(1, &theBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
@@ -111,6 +111,7 @@ void MeGlWindow::paintGL()
 	fullTransformMatrix = mat4();
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, triangleNumIndices, GL_UNSIGNED_SHORT, (void*)triangleIndexByteOffset);
+
 
 	
 }

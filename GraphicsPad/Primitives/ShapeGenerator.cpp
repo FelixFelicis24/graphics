@@ -108,6 +108,103 @@ ShapeData ShapeGenerator::makeCube() {
 	return ret;
 }
 
+ShapeData ShapeGenerator::makePipe()
+{
+	ShapeData ret;
+	Vertex stackVerts[] =
+	{
+		// Front face of pipe
+		vec3(-0.50f, -0.50f, +0.50f),         // 0
+		vec3(+1.00f, +0.00f, +0.00f),         // Color
+		vec3(+0.50f, -0.50f, +0.50f),         // 1
+		vec3(+1.00f, +0.00f, +0.00f),         // Color
+		vec3(+0.50f, +0.50f, +0.50f),         // 2
+		vec3(+1.00f, +0.00f, +0.00f),         // Color
+		vec3(-0.50f, +0.50f, +0.50f),         // 3
+		vec3(+1.00f, +0.00f, +0.00f),         // Color
+		// Back face of pipe
+		vec3(-0.50f, -0.50f, -0.50f),         // 4
+		vec3(+0.00f, +0.00f, +1.00f),         // Color
+		vec3(+0.50f, -0.50f, -0.50f),         // 5
+		vec3(+0.00f, +0.00f, +1.00f),         // Color
+		vec3(+0.50f, +0.50f, -0.50f),         // 6
+		vec3(+0.00f, +0.00f, +1.00f),         // Color
+		vec3(-0.50f, +0.50f, -0.50f),         // 7
+		vec3(+0.00f, +0.00f, +1.00f),         // Color
+		// Right face of pipe
+		vec3(+0.50f, -0.50f, +0.50f),         // 8
+		vec3(+0.60f, +1.00f, +0.00f),         // Color
+		vec3(+0.50f, -0.50f, -0.50f),         // 9
+		vec3(+0.60f, +1.00f, +0.00f),         // Color
+		vec3(+0.50f, +0.50f, -0.50f),         // 10
+		vec3(+0.60f, +1.00f, +0.00f),         // Color
+		vec3(+0.50f, +0.50f, +0.50f),         // 11
+		vec3(+0.60f, +1.00f, +0.00f),         // Color
+		// Left face of pipe
+		vec3(-0.50f, -0.50f, +0.50f),         // 12
+		vec3(+0.00f, +1.00f, +0.00f),         // Color
+		vec3(-0.50f, -0.50f, -0.50f),         // 13
+		vec3(+0.00f, +1.00f, +0.00f),         // Color
+		vec3(-0.50f, +0.50f, -0.50f),         // 14
+		vec3(+0.00f, +1.00f, +0.00f),         // Color
+		vec3(-0.50f, +0.50f, +0.50f),         // 15
+		vec3(+0.00f, +1.00f, +0.00f),         // Color
+		// Top face of pipe
+		vec3(-0.50f, +0.50f, +0.50f),         // 16
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(+0.50f, +0.50f, +0.50f),         // 17
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(+0.50f, +0.50f, -0.50f),         // 18
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(-0.50f, +0.50f, -0.50f),         // 19
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		// Bottom face of pipe
+		vec3(-0.50f, -0.50f, +0.50f),         // 20
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(+0.50f, -0.50f, +0.50f),         // 21
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(+0.50f, -0.50f, -0.50f),         // 22
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+		vec3(-0.50f, -0.50f, -0.50f),         // 23
+		vec3(+0.50f, +0.50f, +0.50f),         // Color
+	};
+
+	// Copy the data to the ShapeData object
+	ret.numVertices = NUM_ARRAY_ELEMENTS(stackVerts);
+	ret.vertices = new Vertex[ret.numVertices];
+	memcpy(ret.vertices, stackVerts, sizeof(stackVerts));
+
+	// Define the indices for the triangles
+	GLushort stackIndices[] =
+	{
+		// Front face of pipe
+		0, 1, 2, // top right triangle
+		0, 2, 3, // bottom left triangle
+		// Back face of pipe
+		4, 5, 6, // top right triangle
+		4, 6, 7, // bottom left triangle
+		// Right face of pipe
+		8, 9, 10, // top right triangle
+		8, 10, 11, // bottom left triangle
+		// Left face of pipe
+		12, 13, 14, // top right triangle
+		12, 14, 15, // bottom left triangle
+		// Top face of pipe
+		16, 17, 18, // top right triangle
+		16, 18, 19, // bottom left triangle
+		// Bottom face of pipe
+		20, 21, 22, // top right triangle
+		20, 22, 23, // bottom left triangle
+	};
+
+	// Copy the indices to the ShapeData object
+	ret.numIndices = NUM_ARRAY_ELEMENTS(stackIndices);
+	ret.indices = new GLushort[ret.numIndices]; // Use GLushort* here
+	memcpy(ret.indices, stackIndices, sizeof(stackIndices));
+}
+
+
+
 ShapeData ShapeGenerator::makeArrow()
 {
 	ShapeData ret;
@@ -204,6 +301,8 @@ ShapeData ShapeGenerator::makeArrow()
 		vec3(+0.25f, -0.25f, +1.00f),         // 39
 		vec3(+0.50f, +0.50f, +0.50f),		  // Color
 	};
+
+
 
 	GLushort stackIndices[] = {
 		0, 1, 2, // Top
