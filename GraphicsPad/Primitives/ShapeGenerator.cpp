@@ -47,7 +47,7 @@ ShapeData ShapeGenerator::makeTriangle()
 
 ShapeData ShapeGenerator::makeCube() {
 	ShapeData ret;
-	Vertex stackVerts[] = 
+	Vertex stackVerts[] =
 	{
 		vec3(-1.0f, +1.0f, +1.0f),  // 0
 		vec3(+1.0f, +0.0f, +0.0f),	// Color
@@ -401,9 +401,9 @@ ShapeData ShapeGenerator::makeTeapot(uint tesselation, const glm::mat4& lidTrans
 	return ret;
 }
 
-void ShapeGenerator::generatePatches(float * v, float * n, float * tc, unsigned short* el, int grid) {
-	float * B = new float[4 * (grid + 1)];  // Pre-computed Bernstein basis functions
-	float * dB = new float[4 * (grid + 1)]; // Pre-computed derivitives of basis functions
+void ShapeGenerator::generatePatches(float* v, float* n, float* tc, unsigned short* el, int grid) {
+	float* B = new float[4 * (grid + 1)];  // Pre-computed Bernstein basis functions
+	float* dB = new float[4 * (grid + 1)]; // Pre-computed derivitives of basis functions
 
 	int idx = 0, elIndex = 0, tcIndex = 0;
 
@@ -433,7 +433,7 @@ void ShapeGenerator::generatePatches(float * v, float * n, float * tc, unsigned 
 	delete[] dB;
 }
 
-void ShapeGenerator::moveLid(int grid, float *v, mat4 lidTransform) {
+void ShapeGenerator::moveLid(int grid, float* v, mat4 lidTransform) {
 
 	int start = 3 * 12 * (grid + 1) * (grid + 1);
 	int end = 3 * 20 * (grid + 1) * (grid + 1);
@@ -449,10 +449,10 @@ void ShapeGenerator::moveLid(int grid, float *v, mat4 lidTransform) {
 }
 
 void ShapeGenerator::buildPatchReflect(int patchNum,
-	float *B, float *dB,
-	float *v, float *n,
-	float *tc, unsigned short *el,
-	int &index, int &elIndex, int &tcIndex, int grid,
+	float* B, float* dB,
+	float* v, float* n,
+	float* tc, unsigned short* el,
+	int& index, int& elIndex, int& tcIndex, int grid,
 	bool reflectX, bool reflectY)
 {
 	glm::vec3 patch[4][4];
@@ -490,10 +490,10 @@ void ShapeGenerator::buildPatchReflect(int patchNum,
 }
 
 void ShapeGenerator::buildPatch(glm::vec3 patch[][4],
-	float *B, float *dB,
-	float *v, float *n, float *tc,
-	unsigned short *el,
-	int &index, int &elIndex, int &tcIndex, int grid, glm::mat3 reflect,
+	float* B, float* dB,
+	float* v, float* n, float* tc,
+	unsigned short* el,
+	int& index, int& elIndex, int& tcIndex, int grid, glm::mat3 reflect,
 	bool invertNormal)
 {
 	int startIndex = index / 3;
@@ -554,20 +554,20 @@ void ShapeGenerator::getPatch(int patchNum, glm::vec3 patch[][4], bool reverseV)
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + (3 - v)]][0],
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + (3 - v)]][1],
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + (3 - v)]][2]
-					);
+				);
 			}
 			else {
 				patch[u][v] = glm::vec3(
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + v]][0],
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + v]][1],
 					Teapot::cpdata[Teapot::patchdata[patchNum][u * 4 + v]][2]
-					);
+				);
 			}
 		}
 	}
 }
 
-void ShapeGenerator::computeBasisFunctions(float * B, float * dB, int grid) {
+void ShapeGenerator::computeBasisFunctions(float* B, float* dB, int grid) {
 	float inc = 1.0f / grid;
 	for (int i = 0; i <= grid; i++)
 	{
@@ -588,7 +588,7 @@ void ShapeGenerator::computeBasisFunctions(float * B, float * dB, int grid) {
 	}
 }
 
-glm::vec3 ShapeGenerator::evaluate(int gridU, int gridV, float *B, glm::vec3 patch[][4])
+glm::vec3 ShapeGenerator::evaluate(int gridU, int gridV, float* B, glm::vec3 patch[][4])
 {
 	glm::vec3 p(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < 4; i++) {
@@ -599,7 +599,7 @@ glm::vec3 ShapeGenerator::evaluate(int gridU, int gridV, float *B, glm::vec3 pat
 	return p;
 }
 
-glm::vec3 ShapeGenerator::evaluateNormal(int gridU, int gridV, float *B, float *dB, glm::vec3 patch[][4])
+glm::vec3 ShapeGenerator::evaluateNormal(int gridU, int gridV, float* B, float* dB, glm::vec3 patch[][4])
 {
 	glm::vec3 du(0.0f, 0.0f, 0.0f);
 	glm::vec3 dv(0.0f, 0.0f, 0.0f);
@@ -634,5 +634,72 @@ ShapeData ShapeGenerator::generateNormals(const ShapeData& data)
 	ret.indices = new GLushort[ret.numIndices];
 	for (int i = 0; i < ret.numIndices; i++)
 		ret.indices[i] = i;
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePyramid()
+{
+	ShapeData ret;
+
+	// Vertices for the pyramid
+	Vertex pyramidVerts[] =
+	{
+		// Base
+		glm::vec3(-1.0f, -1.0f, -1.0f), // 0
+		glm::vec3(+1.0f, 0.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, -1.0f), // 1
+		glm::vec3(0.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, +1.0f), // 2
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, +1.0f), // 3
+		glm::vec3(1.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		// Faces
+		glm::vec3(0.0f, +1.0f, 0.0f),   // 4 (top vertex)
+		glm::vec3(1.0f, 0.0f, 1.0f),    // Color
+		glm::vec3(0.0f, 1.0f, 0.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, -1.0f), // 5
+		glm::vec3(1.0f, 1.0f, 1.0f),    // Color
+		glm::vec3(-1.0f, 0.0f, 0.0f),   // Normal
+
+		glm::vec3(+1.0f, -1.0f, -1.0f), // 6
+		glm::vec3(1.0f, 0.0f, 0.0f),    // Color
+		glm::vec3(1.0f, 0.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, +1.0f), // 7
+		glm::vec3(0.0f, 1.0f, 1.0f),    // Color
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, +1.0f), // 8
+		glm::vec3(1.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Normal
+	};
+
+	ret.numVertices = sizeof(pyramidVerts) / sizeof(*pyramidVerts);
+	ret.vertices = new Vertex[ret.numVertices];
+	memcpy(ret.vertices, pyramidVerts, sizeof(pyramidVerts));
+
+	// Define the indices for the pyramid
+	GLushort pyramidIndices[] = {
+		0, 2, 1, // Base
+		0, 3, 2,
+		4, 6, 5, // Faces
+		4, 7, 6,
+		4, 8, 7,
+		4, 5, 8,
+	};
+
+	ret.numIndices = sizeof(pyramidIndices) / sizeof(*pyramidIndices);
+	ret.indices = new GLushort[ret.numIndices];
+	memcpy(ret.indices, pyramidIndices, sizeof(pyramidIndices));
+
 	return ret;
 }

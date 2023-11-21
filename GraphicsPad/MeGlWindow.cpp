@@ -21,6 +21,7 @@ GLuint programID;
 GLuint teapotNumIndices;
 GLuint arrowNumIndices;
 GLuint planeNumIndices;
+GLuint pyramidNumIndices;
 Camera camera;
 GLuint fullTransformationUniformLocation;
 
@@ -29,22 +30,26 @@ GLuint theBufferID;
 GLuint teapotVertexArrayObjectID;
 GLuint arrowVertexArrayObjectID;
 GLuint planeVertexArrayObjectID;
+GLuint pyramidVertexArrayObjectID;
 GLuint teapotIndexByteOffset;
 GLuint arrowIndexByteOffset;
 GLuint planeIndexByteOffset;
+GLuint pyramidIndexByteOffset;
 
 void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData teapot = ShapeGenerator::makeTeapot();
 	ShapeData arrow = ShapeGenerator::makeArrow();
 	ShapeData plane = ShapeGenerator::makePlane(20);
+	ShapeData pyramid = ShapeGenerator::makePyramid();
 
 	glGenBuffers(1, &theBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
 	glBufferData(GL_ARRAY_BUFFER, 
 		teapot.vertexBufferSize() + teapot.indexBufferSize() +
 		arrow.vertexBufferSize() + arrow.indexBufferSize() +
-		plane.vertexBufferSize() + plane.indexBufferSize(), 0, GL_STATIC_DRAW);
+		plane.vertexBufferSize() + plane.indexBufferSize() +
+		pyramid.vertexBufferSize() + pyramid.indexBufferSize(), 0, GL_STATIC_DRAW);
 	GLsizeiptr currentOffset = 0;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, teapot.vertexBufferSize(), teapot.vertices);
 	currentOffset += teapot.vertexBufferSize();
@@ -61,14 +66,21 @@ void MeGlWindow::sendDataToOpenGL()
 	planeIndexByteOffset = currentOffset;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, plane.indexBufferSize(), plane.indices);
 	currentOffset += plane.indexBufferSize();
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, pyramid.vertexBufferSize(), pyramid.vertices);
+	currentOffset += pyramid.vertexBufferSize();
+	pyramidIndexByteOffset = currentOffset;
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, pyramid.indexBufferSize(), pyramid.indices);
+	currentOffset += pyramid.indexBufferSize();
 
 	teapotNumIndices = teapot.numIndices;
 	arrowNumIndices = arrow.numIndices;
 	planeNumIndices = plane.numIndices;
+	pyramidNumIndices = pyramid.numIndices;
 
 	glGenVertexArrays(1, &teapotVertexArrayObjectID);
 	glGenVertexArrays(1, &arrowVertexArrayObjectID);
 	glGenVertexArrays(1, &planeVertexArrayObjectID);
+	glGenVertexArrays(1, &pyramidVertexArrayObjectID);
 
 	glBindVertexArray(teapotVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
@@ -102,9 +114,21 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(planeByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, theBufferID);
 
+	glBindVertexArray(pyramidVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
+	GLuint pyramidByteOffset = planeByteOffset + plane.vertexBufferSize() + plane.indexBufferSize();
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)pyramidByteOffset);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(pyramidByteOffset + sizeof(float) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(pyramidByteOffset + sizeof(float) * 6));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, theBufferID);
+
 	teapot.cleanup();
 	arrow.cleanup();
 	plane.cleanup();
+	pyramid.cleanup();
 }
 
 void MeGlWindow::paintGL()
@@ -139,14 +163,21 @@ void MeGlWindow::paintGL()
 		glm::rotate(-90.0f, vec3(1.0f, 0.0f, 0.0f));
 	fullTransformMatrix = worldToProjectionMatrix * teapot2ModelToWorldMatrix;
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
-	//glDrawElements(GL_TRIANGLES, teapotNumIndices, GL_UNSIGNED_SHORT, (void*)teapotIndexByteOffset);
+	glDrawElements(GL_TRIANGLES, teapotNumIndices, GL_UNSIGNED_SHORT, (void*)teapotIndexByteOffset);
 
 	// Arrow
 	glBindVertexArray(arrowVertexArrayObjectID);
-	mat4 arrowModelToWorldMatrix = glm::translate(0.0f, 1.0f, 3.0f) * glm::rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+	mat4 arrowModelToWorldMatrix = glm::translate(0.0f, 1.0f, -3.0f);
 	fullTransformMatrix = worldToProjectionMatrix * arrowModelToWorldMatrix;
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
+
+	// Pyramid
+	glBindVertexArray(pyramidVertexArrayObjectID);
+	mat4 pyramidModelToWorldMatrix = glm::translate(0.0f, 2.0f, -1.0f);
+	fullTransformMatrix = worldToProjectionMatrix * pyramidModelToWorldMatrix;
+	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, pyramidNumIndices, GL_UNSIGNED_SHORT, (void*)pyramidIndexByteOffset);
 
 	// Plane
 	glBindVertexArray(planeVertexArrayObjectID);
