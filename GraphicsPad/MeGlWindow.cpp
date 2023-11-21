@@ -32,8 +32,8 @@ GLuint triangleIndexByteOffset;
 
 void MeGlWindow::sendDataToOpenGL()
 {
-	ShapeData cube = ShapeGenerator::makeCube();
-	ShapeData triangle = ShapeGenerator::makePipe();
+	ShapeData cube = ShapeGenerator::makePyramid();
+	ShapeData triangle = ShapeGenerator::makeTriangle();
 
 	glGenBuffers(1, &theBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
@@ -89,11 +89,29 @@ void MeGlWindow::paintGL()
 	mat4 worldToViewMatrix = camera.getWorldToViewMatrix();
 	mat4 worldToProjectionMatrix = viewToProjectionMatrix * worldToViewMatrix;
 
-	// Cube
+	// Pyramid
 	glBindVertexArray(cubeVertexArrayObjectID);
 	mat4 cube1ModelToWorldMatrix =
+		glm::translate(vec3(0.0f, 1.0f, -6.0f)) *
+		glm::rotate(0.0f, vec3(1.0f, 0.0f, 0.0f));
+	fullTransformMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
+	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+	
+	// Pyramid
+	glBindVertexArray(cubeVertexArrayObjectID);
+	cube1ModelToWorldMatrix =
 		glm::translate(vec3(0.0f, 0.0f, -6.0f)) *
-		glm::rotate(45.0f, vec3(1.0f, 1.0f, 0.0f));
+		glm::rotate(180.0f, vec3(1.0f, 0.0f, 0.0f));
+	fullTransformMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
+	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+	
+	// Pyramid
+	glBindVertexArray(cubeVertexArrayObjectID);
+	cube1ModelToWorldMatrix =
+		glm::translate(vec3(2.0f, 1.0f, -3.0f)) *
+		glm::rotate(180.0f, vec3(0.0f, 1.0f, 0.0f));
 	fullTransformMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &fullTransformMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
