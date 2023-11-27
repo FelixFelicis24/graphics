@@ -370,6 +370,73 @@ ShapeData ShapeGenerator::makePlane(uint dimensions)
 	return ret;
 }
 
+ShapeData ShapeGenerator::makePyramid()
+{
+	ShapeData ret;
+
+	// Vertices for the pyramid
+	Vertex pyramidVerts[] =
+	{
+		// Base
+		glm::vec3(-1.0f, -1.0f, -1.0f), // 0
+		glm::vec3(+1.0f, 0.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, -1.0f), // 1
+		glm::vec3(0.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, +1.0f), // 2
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, +1.0f), // 3
+		glm::vec3(1.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, -1.0f, 0.0f),    // Normal
+
+		// Faces
+		glm::vec3(0.0f, +1.0f, 0.0f),   // 4 (top vertex)
+		glm::vec3(1.0f, 0.0f, 1.0f),    // Color
+		glm::vec3(0.0f, 1.0f, 0.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, -1.0f), // 5
+		glm::vec3(1.0f, 1.0f, 1.0f),    // Color
+		glm::vec3(-1.0f, 0.0f, 0.0f),   // Normal
+
+		glm::vec3(+1.0f, -1.0f, -1.0f), // 6
+		glm::vec3(1.0f, 0.0f, 0.0f),    // Color
+		glm::vec3(1.0f, 0.0f, 0.0f),    // Normal
+
+		glm::vec3(+1.0f, -1.0f, +1.0f), // 7
+		glm::vec3(0.0f, 1.0f, 1.0f),    // Color
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Normal
+
+		glm::vec3(-1.0f, -1.0f, +1.0f), // 8
+		glm::vec3(1.0f, 1.0f, 0.0f),    // Color
+		glm::vec3(0.0f, 0.0f, 1.0f),    // Normal
+	};
+
+	ret.numVertices = sizeof(pyramidVerts) / sizeof(*pyramidVerts);
+	ret.vertices = new Vertex[ret.numVertices];
+	memcpy(ret.vertices, pyramidVerts, sizeof(pyramidVerts));
+
+	// Define the indices for the pyramid
+	GLushort pyramidIndices[] = {
+		0, 2, 1, // Base
+		0, 3, 2,
+		4, 6, 5, // Faces
+		4, 7, 6,
+		4, 8, 7,
+		4, 5, 8,
+	};
+
+	ret.numIndices = sizeof(pyramidIndices) / sizeof(*pyramidIndices);
+	ret.indices = new GLushort[ret.numIndices];
+	memcpy(ret.indices, pyramidIndices, sizeof(pyramidIndices));
+
+	return ret;
+}
+
 ShapeData ShapeGenerator::makeTeapot(uint tesselation, const glm::mat4& lidTransform)
 {
 	ShapeData ret;
