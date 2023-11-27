@@ -122,7 +122,7 @@ void MeGlWindow::paintGL()
 	GLuint fullTransformationUniformLocation;
 	GLuint modelToWorldMatrixUniformLocation;
 
-	glm::vec3 lightPositionWorld(0.0f, 1.5f, 0.0f);
+	glm::vec3 lightPositionWorld(0.0f, 3.0f, 0.0f);
 
 	// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
@@ -168,7 +168,7 @@ void MeGlWindow::paintGL()
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &modelToProjectionMatrix[0][0]);
 	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
 	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
-		&planeModelToWorldMatrix[0][0]);
+		&pyramidModelToWorldMatrix[0][0]);
 	glDrawElements(GL_TRIANGLES, pyramidNumIndices, GL_UNSIGNED_SHORT, (void*)pyramidIndexByteOffset);
 
 }
