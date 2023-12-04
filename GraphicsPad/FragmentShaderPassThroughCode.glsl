@@ -5,5 +5,5 @@ out vec4 daColor;
 
 void main()
 {
-	daColor = vec4(vertexToFragmentColor, 1);
+	daColor = vec4(vertexToFragmentColor, 1.0);
 }

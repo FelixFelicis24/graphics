@@ -16,7 +16,7 @@ using glm::vec4;
 using glm::mat4;
 
 const uint NUM_VERTICES_PER_TRI = 3;
-const uint NUM_FLOATS_PER_VERTICE = 9;
+const uint NUM_FLOATS_PER_VERTICE = 11;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
 GLuint passThroughProgramID;
@@ -26,11 +26,12 @@ GLuint pyramidNumIndices;
 Camera camera;
 
 GLuint theBufferID;
+GLuint textureID;
 
 GLuint cubeVertexArrayObjectID;
 GLuint planeVertexArrayObjectID;
 GLuint pyramidVertexArrayObjectID;
-GLuint arrowIndexByteOffset;
+GLuint cubeIndexByteOffset;
 GLuint planeIndexByteOffset;
 GLuint pyramidIndexByteOffset;
 
@@ -38,7 +39,17 @@ void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData cube = ShapeGenerator::makeCube();
 	ShapeData plane = ShapeGenerator::makePlane();
-	ShapeData pyramid = ShapeGenerator::makePyramid();
+	ShapeData pyramid = ShapeGenerator::makeCube();
+
+	std::string fileName = "./Pattern.png";
+	QImage img = QGLWidget::convertToGLFormat(QImage(fileName.c_str(), "PNG"));
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	glGenBuffers(1, &theBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
@@ -49,7 +60,7 @@ void MeGlWindow::sendDataToOpenGL()
 	GLsizeiptr currentOffset = 0;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, cube.vertexBufferSize(), cube.vertices);
 	currentOffset += cube.vertexBufferSize();
-	arrowIndexByteOffset = currentOffset;
+	cubeIndexByteOffset = currentOffset;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, cube.indexBufferSize(), cube.indices);
 	currentOffset += cube.indexBufferSize();
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, plane.vertexBufferSize(), plane.vertices);
@@ -76,32 +87,38 @@ void MeGlWindow::sendDataToOpenGL()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(sizeof(float) * 6));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, theBufferID);
 
 	glBindVertexArray(planeVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
 	GLuint planeByteOffset = cube.vertexBufferSize() + cube.indexBufferSize();
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)planeByteOffset);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(planeByteOffset + sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(planeByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(planeByteOffset + sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, theBufferID);
 
 	glBindVertexArray(pyramidVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
 	GLuint pyramidByteOffset = planeByteOffset + plane.vertexBufferSize() + plane.indexBufferSize();
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)pyramidByteOffset);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(pyramidByteOffset + sizeof(float) * 3));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(pyramidByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, VERTEX_BYTE_SIZE, (void*)(pyramidByteOffset + sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, theBufferID);
 
 	cube.cleanup();
@@ -122,9 +139,21 @@ void MeGlWindow::paintGL()
 	GLuint fullTransformationUniformLocation;
 	GLuint modelToWorldMatrixUniformLocation;
 
-	glm::vec3 lightPositionWorld(0.0f, 3.0f, 0.0f);
+	glm::vec3 lightPositionWorld(0.0f, 2.0f, 0.0f);
 
-	// Cube
+	GLint ambientLightUniformLocation = glGetUniformLocation(programID, "ambientLight");
+	vec4 ambientLight(0.05f, 0.05f, 0.05f, 1.0f);
+	glUniform4fv(ambientLightUniformLocation, 1, &ambientLight[0]);
+	GLint eyePositionWorldUniformLocation = glGetUniformLocation(programID, "eyePositionWorld");
+	vec3 eyePosition = camera.getPosition();
+	glUniform3fv(eyePositionWorldUniformLocation, 1, &eyePosition[0]);
+	GLint lightPositionUniformLocation = glGetUniformLocation(programID, "lightPositionWorld");
+	glUniform3fv(lightPositionUniformLocation, 1, &lightPositionWorld[0]);
+
+	GLint baseColorTextUniformLocation = glGetUniformLocation(programID, "myTexture");
+	glUniform1i(baseColorTextUniformLocation, 0);
+
+	// CubeLight
 	glBindVertexArray(cubeVertexArrayObjectID);
 	mat4 cubeModelToWorldMatrix = 
 		glm::translate(lightPositionWorld) *
@@ -136,20 +165,11 @@ void MeGlWindow::paintGL()
 	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
 	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
 		&cubeModelToWorldMatrix[0][0]);
-	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+
 
 	// Plane
 	glUseProgram(programID);
-
-	GLint ambientLightUniformLocation = glGetUniformLocation(programID, "ambientLight");
-	vec4 ambientLight(0.05f, 0.05f, 0.05f, 1.0f);
-	glUniform4fv(ambientLightUniformLocation, 1, &ambientLight[0]);
-	GLint eyePositionWorldUniformLocation = glGetUniformLocation(programID, "eyePositionWorld");
-	glm::vec3 eyePosition = camera.getPosition();
-	glUniform3fv(eyePositionWorldUniformLocation, 1, &eyePosition[0]);
-	GLint lightPositionUniformLocation = glGetUniformLocation(programID, "lightPositionWorld");
-	glUniform3fv(lightPositionUniformLocation, 1, &lightPositionWorld[0]);
-
 	glBindVertexArray(planeVertexArrayObjectID);
 	mat4 planeModelToWorldMatrix;
 	modelToProjectionMatrix = worldToProjectionMatrix * planeModelToWorldMatrix;
@@ -161,16 +181,44 @@ void MeGlWindow::paintGL()
 	glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
 
 	// Pyramid
-	glBindVertexArray(pyramidVertexArrayObjectID);
+
+	/*glBindVertexArray(pyramidVertexArrayObjectID);
 	mat4 pyramidModelToWorldMatrix = glm::translate(0.0f, 1.0f, -4.0f);
 	modelToProjectionMatrix= worldToProjectionMatrix * pyramidModelToWorldMatrix;
 	fullTransformationUniformLocation = glGetUniformLocation(programID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &modelToProjectionMatrix[0][0]);
 	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
 	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
-		&pyramidModelToWorldMatrix[0][0]);
-	glDrawElements(GL_TRIANGLES, pyramidNumIndices, GL_UNSIGNED_SHORT, (void*)pyramidIndexByteOffset);
+		&pyramidModelToWorldMatrix[0][0]);*/
+	//glDrawElements(GL_TRIANGLES, pyramidNumIndices, GL_UNSIGNED_SHORT, (void*)pyramidIndexByteOffset);
 
+	// Cube with tex 1
+	glBindVertexArray(cubeVertexArrayObjectID);
+	mat4 cube1ModelToWorldMatrix =
+		glm::translate(2.0f, 1.0f, -1.0f)*
+		glm::scale(0.5f, 0.5f, 0.5f);
+	modelToProjectionMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
+	fullTransformationUniformLocation = glGetUniformLocation(programID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &modelToProjectionMatrix[0][0]);
+	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
+	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
+		&cube1ModelToWorldMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+
+	// Cube with tex 2
+	glBindVertexArray(cubeVertexArrayObjectID);
+	cube1ModelToWorldMatrix =
+		glm::translate(-2.0f, 2.0f, -2.0f) *
+		glm::scale(1.0f, 1.0f, 1.0f) * 
+		glm::rotate(45.0f, 1.0f, 1.0f, 1.0f)
+		;
+	modelToProjectionMatrix = worldToProjectionMatrix * cube1ModelToWorldMatrix;
+	fullTransformationUniformLocation = glGetUniformLocation(programID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(fullTransformationUniformLocation, 1, GL_FALSE, &modelToProjectionMatrix[0][0]);
+	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
+	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
+		&cube1ModelToWorldMatrix[0][0]);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 }
 
 void MeGlWindow::mouseMoveEvent(QMouseEvent* e)

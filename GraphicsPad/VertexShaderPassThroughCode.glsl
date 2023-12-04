@@ -9,6 +9,6 @@ uniform mat4 modelToProjectionMatrix;
 
 void main()
 {
-	gl_Position = modelToProjectionMatrix * vertexPositionModel;
+	gl_Position = modelToProjectionMatrix * vec4(vertexPositionModel, 1.0);
 	vertexToFragmentColor = vertexColor;
 }
