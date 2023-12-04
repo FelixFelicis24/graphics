@@ -3,7 +3,7 @@
 out vec4 daColor;
 in vec3 normalWorld;
 in vec3 vertexPositionWorld;
-in vec2 uv;
+in vec2 TexCoord;
 
 uniform vec3 lightPositionWorld;
 uniform vec3 eyePositionWorld;
@@ -12,7 +12,8 @@ uniform sampler2D myTexture;
 
 void main()
 {
-	vec4 texColor = texture(myTexture, uv);
+	//Tex
+	vec4 texColor = texture(myTexture, TexCoord);
 	//Diffuse
 	vec3 lightVectorWorld = normalize(lightPositionWorld - vertexPositionWorld);
 	float brightness = dot(lightVectorWorld, normalize(normalWorld));
@@ -25,5 +26,7 @@ void main()
 	s = pow(s, 30);
 	vec4 specularLight = vec4(0, s, s, 1);
 
-	daColor = (ambientLight + clamp(diffuseLight, 0, 1) + clamp(specularLight, 0, 1)) * tex;
+	//Tex
+	vec4 texColor = texture(myTexture, TexCoord);
+	daColor = (ambientLight + clamp(diffuseLight, 0, 1) + clamp(specularLight, 0, 1)) * texColor;
 }

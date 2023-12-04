@@ -31,7 +31,7 @@ GLuint theBufferID;
 GLuint cubeVertexArrayObjectID;
 GLuint planeVertexArrayObjectID;
 GLuint pyramidVertexArrayObjectID;
-GLuint arrowIndexByteOffset;
+GLuint cubeIndexByteOffset;
 GLuint planeIndexByteOffset;
 GLuint pyramidIndexByteOffset;
 
@@ -40,12 +40,14 @@ void MeGlWindow::sendDataToOpenGL()
 	ShapeData cube = ShapeGenerator::makeCube();
 	ShapeData plane = ShapeGenerator::makePlane();
 	ShapeData pyramid = ShapeGenerator::makeCube();
-
-	QImage img = (QGLWidget::convertToGLFormat(QImage("Pattern", "PNG"));
-	glActiveTexture(GL_TEXTURE());
+	
+	std::string fileName = "Pattern.png";
+	QImage img = QGLWidget::convertToGLFormat(QImage(fileName.c_str(), "PNG"));
+	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 320, 240, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
+
 
 	glGenBuffers(1, &theBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, theBufferID);
@@ -56,7 +58,7 @@ void MeGlWindow::sendDataToOpenGL()
 	GLsizeiptr currentOffset = 0;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, cube.vertexBufferSize(), cube.vertices);
 	currentOffset += cube.vertexBufferSize();
-	arrowIndexByteOffset = currentOffset;
+	cubeIndexByteOffset = currentOffset;
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, cube.indexBufferSize(), cube.indices);
 	currentOffset += cube.indexBufferSize();
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, plane.vertexBufferSize(), plane.vertices);
@@ -134,8 +136,8 @@ void MeGlWindow::paintGL()
 	// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
 	mat4 cubeModelToWorldMatrix = 
-		glm::translate(lightPositionWorld) *
-		glm::scale(0.1f, 0.1f, 0.1f);
+		glm::translate(glm::vec3(-2.0f, 0.0f, -6.0f)) *
+		glm::rotate(-90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	modelToProjectionMatrix = worldToProjectionMatrix * cubeModelToWorldMatrix;
 	glUseProgram(passThroughProgramID);
 	fullTransformationUniformLocation = glGetUniformLocation(programID, "modelToProjectionMatrix");
@@ -143,7 +145,7 @@ void MeGlWindow::paintGL()
 	modelToWorldMatrixUniformLocation = glGetUniformLocation(programID, "modelToWorldMatrix");
 	glUniformMatrix4fv(modelToWorldMatrixUniformLocation, 1, GL_FALSE,
 		&cubeModelToWorldMatrix[0][0]);
-	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
+	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 
 	// Plane
 	glUseProgram(programID);
